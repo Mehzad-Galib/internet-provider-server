@@ -120,6 +120,8 @@ client.connect(err => {
     })
   }) 
 
+  // admin can change the state by updating
+
 
 app.get('/', (req, res) => {
     res.send('Database is Working')
