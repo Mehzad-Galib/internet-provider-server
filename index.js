@@ -18,7 +18,9 @@ client.connect(err => {
   const reviewCollection = client.db(`${process.env.DB_NAME}`).collection('reviews');
   const serviceCollection = client.db(`${process.env.DB_NAME}`).collection('services');
   const ordersCollection = client.db(`${process.env.DB_NAME}`).collection('orders');
+  const adminCollection = client.db(`${process.env.DB_NAME}`).collection('admins');
 
+    // service added by admin from client side
   app.post('/addService', (req, res) => {
     const services = req.body;
     serviceCollection.insertOne(services)
@@ -28,6 +30,7 @@ client.connect(err => {
     }) 
   })
 
+  // customer checkout info when he clicks buy now, for specific id
   app.get('/checkout/:id', (req, res) => {
     serviceCollection.find({_id: ObjectId(req.params.id)})
     .toArray((err, result)=>{
@@ -36,7 +39,7 @@ client.connect(err => {
   })
 
 
-
+    // admin can see all order placed by customers
   app.post('/orderInfo', (req,res)=>{
     const newInfo = req.body;
     ordersCollection.insertOne(newInfo)
@@ -46,13 +49,35 @@ client.connect(err => {
     }) 
   })
 
-  app.get('/orders', (req, res) => {
-    ordersCollection.find({})
-    .toArray((err, documents)=>{
-      res.send(documents);
+    // posting admin email from client side
+  app.post('/makeAdmin', (req,res)=>{
+    const newInfo = req.body;
+    adminCollection.insertOne(newInfo)
+    .then(result=> {
+      console.log(result);
+      res.send(result.insertCount > 0)
+    }) 
+  })
+
+    // sending admin email to client side
+  app.get('/isAdmin', (req, res)=>{
+    
+    adminCollection.find({email : req.query.email})
+    .toArray((err, admins)=>{
+      res.send(admins);
+      
     })
   })
 
+    // admin will see placed orders
+  app.get('/orders', (req, res) => {
+    ordersCollection.find({})
+    .toArray((err, orders)=>{
+      res.send(orders);
+    })
+  })
+
+    // customer can see his previous service purchases
   app.get('/purchase', (req, res)=>{
     ordersCollection.find({email: req.query.email})
     .toArray((err, documents)=>{
@@ -60,6 +85,8 @@ client.connect(err => {
     })
   })
 
+  
+    // customer can add user review from dashboard
   app.post('/addReview', (req, res) => {
     const users = req.body;
     reviewCollection.insertOne(users)
@@ -69,6 +96,7 @@ client.connect(err => {
     }) 
   })
 
+    // customer reviews can be seen from home page
   app.get('/review', (req, res) => {
     reviewCollection.find({})
     .toArray((err, reviews)=>{
@@ -77,7 +105,7 @@ client.connect(err => {
   })
 
 
-
+    // services list can be seen at home page
   app.get('/services', (req, res)=>{
     serviceCollection.find({})
     .toArray((err, services)=>{
@@ -85,6 +113,7 @@ client.connect(err => {
     })
   })
 
+    // admin can delete specific services
   app.delete('/delete/:id', (req, res)=>{
     serviceCollection.deleteOne({_id: ObjectId(req.params.id)})
     .then((err, result)=>{     
