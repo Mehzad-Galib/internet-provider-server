@@ -123,20 +123,21 @@ client.connect(err => {
   // admin can change the state by updating
   app.post('/updateOrderStatus', (req, res)=>{
     const order = req.body;
-    // console.log(order.id, order.status);
+    console.log(order.id, order.status);
     ordersCollection.updateOne(
       {_id: ObjectId(order.id)},
       {
-        $set: {orderStatus: order.orderStatus}
+        $set: {orderStatus: order.status}
+        
       },
       (err, result)=>{
         if(err){
-          console.log(err)
+          console.log('error')
           res.status(500).send({message: err})
         }
         else{
-          res.send(result);
-          console.log(result)
+          res.send(result)
+          console.log('success')
         }
       }
       )
