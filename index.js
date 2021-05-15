@@ -137,7 +137,7 @@ client.connect(err => {
         }
         else{
           res.send(result)
-          console.log('success')
+          console.log('successful')
         }
       }
       )
